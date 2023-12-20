@@ -31,19 +31,27 @@ Step 2: Define Operations The document outlines two key operations: merging shap
 
 For example:
 
+```lean
 def merge_shapes (s1 s2 : Shape) : Option Shape
 def reshape_mask (old_mask : Mask) (new_shape : Shape) : Option Mask
+```
+
 We would use Option type to represent the potential failure of these operations when the conditions are not met.
 
 Step 3: Formalize Assumptions and Claims We turn English descriptions of merge conditions into predicates. For example, for the claim that two parts of a shape p₁ and p₂ are mergeable:
 
+```lean
 def are_mergeable (p₁ p₂ : Shape) : Prop := ...
+```
 Step 4: Prove Conclusions We would use Lean's proof environment to construct proofs for the given claims. Depending on the claims, we might employ tactics like induction, apply, and exact.
 
 For the given claim that if prod([k₁ ... kp]) < p₁ and prod([k₁ ... kₚ₊₁]) > p₁, the reshape is not possible, we might do:
 
+```lean
 lemma reshape_not_possible (p₁ : Shape) (ks : Shape) (p : ℕ) : prod(take p ks) < p₁ → prod(take (p + 1) ks) > p₁ → ¬reshapable ks p₁ :=
 ...
-Now let's translate each of these steps into Lean code. We'll start by fleshing out Step 1 and defining our basic types. Once the types are set up, we can proceed to define the operations and construct proofs based on the assumptions outlined in the provided document.
+```
+
+We'll start by fleshing out Step 1 and defining our basic types. Once the types are set up, we can proceed to define the operations and construct proofs based on the assumptions outlined in the provided document.
 
 Please provide any specific details or structures you’d like to see in the types and operations, if they are different from the proposed examples. Once we have the types represented in Lean, we will need to iterate on defining functions and eventually constructing proofs for the conditions outlined.
