@@ -48,18 +48,46 @@
 
 
 
+-- import Lean
+
+-- namespace Nat
+
+-- -- Theorem that states adding zero to any natural number `n` results in `n`.
+-- theorem zero_add1 (n : Nat) : 0 + n = n := by
+--   induction n with
+--   | zero => rfl -- base case
+--   | succ n ih => -- inductive step
+--     have : 0 + succ n = succ (0 + n) := by rfl
+--     rw [this, ih]
+
+-- end Nat
+
+
+-- open Nat
+
+-- theorem add_comm (m n : Nat) : m + n = n + m :=
+--   Nat.recOn (motive := λ n => m + n = n + m) n
+--     (by simp)
+--     (fun n ih =>
+--       by simp [ih, Nat.add_succ, Nat.succ_add])
 
 
 import Lean
 
-namespace Nat
+-- Here we would typically import the relevant part of the mathlib library for Lean 4
+-- The definition of `Nat` and its associated arithmetic operations are part of the Lean core in the `Init` namespace.
 
--- Theorem that states adding zero to any natural number `n` results in `n`.
-theorem zero_add1 (n : Nat) : 0 + n = n := by
-  induction n with
-  | zero => rfl -- base case
-  | succ n ih => -- inductive step
-    have : 0 + succ n = succ (0 + n) := by rfl
-    rw [this, ih]
+open Lean   -- This lets us use Lean's core features without prefixing them with `Lean.`
+open Nat    -- Similarly, this lets us use `Nat` without prefixing
 
-end Nat
+-- As of my knowledge cutoff in April 2023, here's a hypothetical proof using an assumed 'mathlib' for Lean 4.
+
+-- The following lemma states that for all natural numbers a and b, a + b equals b + a.
+-- We use `theorem` in Lean to define a proven statement.
+theorem add_comm (a b : Nat) : a + b = b + a :=
+  Nat.recOn b
+    (by rw [Nat.add_zero, Nat.zero_add])  -- base case: a + 0 = 0 + a
+    (fun b ih =>                         -- inductive step: assume a + b = b + a for some b
+      by rw [Nat.add_succ, ih, Nat.succ_add])  -- then show a + (b + 1) = (b + 1) + a
+
+#check add_comm  -- This checks the theorem we just proved.
