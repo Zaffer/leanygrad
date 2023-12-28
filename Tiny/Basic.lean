@@ -72,22 +72,22 @@
 --       by simp [ih, Nat.add_succ, Nat.succ_add])
 
 
-import Lean
+-- import Lean
 
--- Here we would typically import the relevant part of the mathlib library for Lean 4
--- The definition of `Nat` and its associated arithmetic operations are part of the Lean core in the `Init` namespace.
+-- -- Here we would typically import the relevant part of the mathlib library for Lean 4
+-- -- The definition of `Nat` and its associated arithmetic operations are part of the Lean core in the `Init` namespace.
 
-open Lean   -- This lets us use Lean's core features without prefixing them with `Lean.`
-open Nat    -- Similarly, this lets us use `Nat` without prefixing
+-- open Lean   -- This lets us use Lean's core features without prefixing them with `Lean.`
+-- open Nat    -- Similarly, this lets us use `Nat` without prefixing
 
--- As of my knowledge cutoff in April 2023, here's a hypothetical proof using an assumed 'mathlib' for Lean 4.
+-- -- As of my knowledge cutoff in April 2023, here's a hypothetical proof using an assumed 'mathlib' for Lean 4.
 
--- The following lemma states that for all natural numbers a and b, a + b equals b + a.
--- We use `theorem` in Lean to define a proven statement.
-theorem add_comm (a b : Nat) : a + b = b + a :=
-  Nat.recOn b
-    (by rw [Nat.add_zero, Nat.zero_add])  -- base case: a + 0 = 0 + a
-    (fun b ih =>                         -- inductive step: assume a + b = b + a for some b
-      by rw [Nat.add_succ, ih, Nat.succ_add])  -- then show a + (b + 1) = (b + 1) + a
+-- -- The following lemma states that for all natural numbers a and b, a + b equals b + a.
+-- -- We use `theorem` in Lean to define a proven statement.
+-- theorem add_comm (a b : Nat) : a + b = b + a :=
+--   Nat.recOn b
+--     (by rw [Nat.add_zero, Nat.zero_add])  -- base case: a + 0 = 0 + a
+--     (fun b ih =>                         -- inductive step: assume a + b = b + a for some b
+--       by rw [Nat.add_succ, ih, Nat.succ_add])  -- then show a + (b + 1) = (b + 1) + a
 
-#check add_comm  -- This checks the theorem we just proved.
+-- #check add_comm  -- This checks the theorem we just proved.
