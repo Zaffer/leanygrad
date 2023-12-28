@@ -1,28 +1,43 @@
--- Step 1: Expanding upon the ShapeTracker definition
+/- Step 1: Expanding upon the ShapeTracker definition -/
+-- Define the ShapeTracker structure with the fields and validity condition.
 structure ShapeTracker where
-  old_shape : List ℕ
-  old_stride : List ℕ
-  merge_old_shape : List ℕ
+  old_shape : List Nat
+  old_stride : List Nat
+  merge_old_shape : List Nat
   valid : old_shape.length = old_stride.length -- This line ensures the lists have the same length
 
--- Step 2: Expanding upon the mergeability predicate
+/- Step 2: Expanding upon the mergeability predicate -/
+
+-- Placeholder functions for illustrative purposes only. Replace with actual logic.
+def some_complicated_list_condition (list1 list2 : List Nat) : Prop :=
+  -- Logic to check if list1 can merge with list2
+  true -- Replace 'true' with the actual merge condition.
+
+def some_complicated_stride_condition (stride1 stride2 : List Nat) : Prop :=
+  -- Logic to check if stride1 can merge with stride2
+  true -- Replace 'true' with the actual merge condition.
+-- Define the areMergeable predicate using placeholder functions for sophisticated conditions.
 def areMergeable (shape1 shape2 : ShapeTracker) : Prop :=
   -- This function should check the actual rules for mergeability, e.g., adjacent dimensions.
   -- It will require a sophisticated function definition that checks for Case 1 and Case 2.
-  let shapes_can_merge := some_complicated_list_condition shape1.old_shape shape2.merge_old_shape;
-  let strides_can_merge := some_complicated_stride_condition shape1.old_stride shape2.old_stride;
-  -- Both shape and stride conditions must be satisfied for mergeability.
-  shapes_can_merge ∧ strides_can_merge
+  -- You will need to define some_complicated_list_condition and some_complicated_stride_condition appropriately.
+  let shapes_can_merge : Prop := some_complicated_list_condition shape1.old_shape shape2.merge_old_shape,
+      strides_can_merge : Prop := some_complicated_stride_condition shape1.old_stride shape2.old_stride
+  in shapes_can_merge ∧ strides_can_merge
+  -- Mergeability is satisfied when both conditions are true.
 
--- Step 3: Creating helper lemmas for non-zero and zero strides mergeability
+/- Step 3: Creating helper lemmas for non-zero and zero strides mergeability -/
 -- These should closely follow the logic given in the reshape_without_symbolic.md
 
--- Drawing from the criteria specified, here are simplified examples:
-lemma non_zero_strides_mergeable {st1 st2 s1 : ℕ} (h_non_zero_strides : st1 = st2 * s1 ∧ st1 ≠ 0) :
+-- Define a lemma for the non-zero strides mergeability condition.
+lemma non_zero_strides_mergeable {st1, st2, s1 : Nat}
+  h_non_zero_strides : st1 = st2 * s1 ∧ st1 ≠ 0) : Prop :=
   -- Conclusion about their mergeability according to the specified condition
   true -- Placeholder for now
 
-lemma zero_strides_mergeable {st1 st2 : ℕ} (h_zero_strides : st1 = 0 ∨ st2 = 0) :
+-- Define a lemma for the zero strides mergeability condition.
+lemma zero_strides_mergeable {st1 st2 : Nat}
+  h_zero_strides : st1 = 0 ∨ st2 = 0 :
   -- Conclusion about their mergeability according to the specified condition
   true -- Placeholder for now
 
@@ -36,17 +51,3 @@ theorem shapeTracker_mergeable_theorem {shape1 shape2 : ShapeTracker} (h : areMe
 -- As noted earlier, this is a high-level view of the components needed for your proof.
 -- You’ll need to fill in the details for the predicates `areMergeable`, `non_zero_strides_mergeable`, and `zero_strides_mergeable`.
 -- These will include the specific logic based on the mergeability conditions described in the document.
-
-don't know how to synthesize implicit argument
-  @List.length ?m.33 old_shape
-context:
-old_shape : {ℕ : Type u_1} → List ℕ
-old_stride : {ℕ : Type u_2} → List ℕ
-merge_old_shape : {ℕ : Type u_3} → List ℕ
-⊢ Type u_1 Lean 4
-don't know how to synthesize placeholder
-context:
-old_shape : {ℕ : Type u_1} → List ℕ
-old_stride : {ℕ : Type u_2} → List ℕ
-merge_old_shape : {ℕ : Type u_3} → List ℕ
-⊢ Type u_1 Lean 4
