@@ -6,6 +6,7 @@ structure ShapeTracker where
   merge_old_shape : List Nat
   valid : old_shape.length = old_stride.length -- This line ensures the lists have the same length
 
+
 /- Step 2: Expanding upon the mergeability predicate -/
 
 -- Placeholder functions for illustrative purposes only. Replace with actual logic.
@@ -16,15 +17,17 @@ def some_complicated_list_condition (list1 list2 : List Nat) : Prop :=
 def some_complicated_stride_condition (stride1 stride2 : List Nat) : Prop :=
   -- Logic to check if stride1 can merge with stride2
   true -- Replace 'true' with the actual merge condition.
+
 -- Define the areMergeable predicate using placeholder functions for sophisticated conditions.
 def areMergeable (shape1 shape2 : ShapeTracker) : Prop :=
   -- This function should check the actual rules for mergeability, e.g., adjacent dimensions.
   -- It will require a sophisticated function definition that checks for Case 1 and Case 2.
   -- You will need to define some_complicated_list_condition and some_complicated_stride_condition appropriately.
-  let shapes_can_merge : Prop := some_complicated_list_condition shape1.old_shape shape2.merge_old_shape,
-      strides_can_merge : Prop := some_complicated_stride_condition shape1.old_stride shape2.old_stride
-  in shapes_can_merge ∧ strides_can_merge
+  let shapes_can_merge : Prop := some_complicated_list_condition shape1.old_shape shape2.merge_old_shape;
+  let strides_can_merge : Prop := some_complicated_stride_condition shape1.old_stride shape2.old_stride;
+  shapes_can_merge ∧ strides_can_merge
   -- Mergeability is satisfied when both conditions are true.
+
 
 /- Step 3: Creating helper lemmas for non-zero and zero strides mergeability -/
 -- These should closely follow the logic given in the reshape_without_symbolic.md
@@ -40,6 +43,7 @@ lemma zero_strides_mergeable {st1 st2 : Nat}
   h_zero_strides : st1 = 0 ∨ st2 = 0 :
   -- Conclusion about their mergeability according to the specified condition
   true -- Placeholder for now
+
 
 -- Step 4: Prove that two given ShapeTrackers are mergeable
 theorem shapeTracker_mergeable_theorem {shape1 shape2 : ShapeTracker} (h : areMergeable shape1 shape2) :
