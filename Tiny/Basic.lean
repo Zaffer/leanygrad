@@ -91,3 +91,27 @@
 --       by rw [Nat.add_succ, ih, Nat.succ_add])  -- then show a + (b + 1) = (b + 1) + a
 
 -- #check add_comm  -- This checks the theorem we just proved.
+
+
+-- BASIC EXAMPLE --
+-- import Lean
+
+-- theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by unhygienic
+--   apply And.intro
+--   . exact hp
+--   . apply And.intro
+--     . exact hq
+--     . exact hp
+
+-- #print test
+
+
+
+import Lean
+import Mathlib
+
+theorem test (x y : ℕ) (h : y = x + 7) : 2 * y = 2 * (x + 7) := by
+  rw [h]
+  rfl
+
+#check test
