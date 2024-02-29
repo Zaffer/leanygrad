@@ -1,117 +1,65 @@
--- import Mathlib.Data.Matrix.Basic
+structure Tuple (α : Type) (n : Nat) :=
+  as : List α
+  property : as.length = n
 
--- variable (α : Type u) [Semiring α]
--- variable (m n : ℕ)
-
--- def linear_to_matrix_idx (linear_idx : ℕ) (num_cols : ℕ) : ℕ × ℕ :=
---   (linear_idx / num_cols, linear_idx % num_cols)
-
--- -- Define the reshape function using Matrix with finite sets
--- def reshape_matrix (A : Matrix (Fin m) (Fin n) α) (new_m new_n : ℕ) : Matrix (Fin new_m) (Fin new_n) α :=
---   if h : m * n = new_m * new_n then
---     let new_matrix_fn := λ (i : Fin new_m) (j : Fin new_n) =>
---       let linear_idx := (Fin.val i) * new_n + (Fin.val j);
---       let (orig_row, orig_col) := linear_to_matrix_idx linear_idx n;
---       A (Fin.mk orig_row (Nat.lt_of_mul_lt_mul_right (lt_of_le_of_lt (Nat.mul_le_mul_right _ (Fin.is_lt i)) (Nat.mul_lt_mul_of_pos_right (Nat.lt_succ_self _) (Nat.zero_lt_succ _)))))
---         (Fin.mk orig_col (if h2 : new_n = 0 then False.elim (Nat.pos_of_ne_zero h2) else Nat.mod_lt _ (Nat.pos_of_ne_zero h2)));
---     Matrix.of new_matrix_fn
---   else
---     -- Handle the error case
---     sorry
+structure View (n : Nat) where
+  shape : Tuple Nat n
+  stride : Tuple Nat n
+  mask : List (List Int) -- Assuming a more complex structure for masks might be necessary
+  contiguous : Bool
+  offset : Int
+  min : Tuple Nat n
+  max : Tuple Nat n
 
 
+def size {n : Nat} (v : View n) : Nat :=
+  v.shape.as.foldl (λ acc x ↦ acc * x) 1
+
+def proj {n : Nat} (v : View n) (i : Fin n) (j : Nat) : Nat :=
+  (j - v.offset) / v.strides.as[i.val] -- Assuming division represents the projection operation
+
+def valid {n : Nat} (v : View n) (i : Fin n) (j : Nat) : Bool :=
+  let projected := proj v i j
+  projected >= 0 && projected < v.shape.as[i.val] -- Simplified validity check
+
+def idxs {n : Nat} (v : View n) : List Nat :=
+  List.range (size v) |>.filter (λ j ↦ ∀ i : Fin n, valid v i j)
+
+def reshapeable {n m : Nat} (v1 : View n) (v2 : View m) : Bool :=
+  size v1 = size v2 -- A simplified condition for reshapeability, more complex logic needed for masks and strides
 
 
--- def Shape := List Nat
--- def Stride := List Nat
--- def Mask := List (Nat × Nat) -- Assuming mask is a list of ranges (start, end)
+-- TODO
+-- logic for more complex operations and conditions are next steps.
+-- functions to calculate the size of a view and to project indices
+-- mergeable predicate that checks for both shape compatibility and mask alignment
+-- definitions for reshaping a view, considerating stride adjustments and mask transformations
+-- theorems to establish properties of views and their ops, including when reshaping and merging feasable
 
--- def merge_shapes (s1 s2 : Shape) : Option Shape :=
---   -- The merging logic will go here (to be defined based on the provided document's rules)
---   none
+def mergeable_shapes_and_strides {n : Nat} (v1 v2 : View n) : Bool :=
+  -- Implement logic to compare shapes and strides for mergeability,
+  -- ensuring they align in a way that permits a merged view without data loss
+  sorry
 
--- def reshape_mask (old_mask : Mask) (new_shape : Shape) : Option Mask :=
---   -- The reshaping logic will go here (to be defined based on the provided document's rules)
---   none
+def view_mergeable (v1 v2 : View n) : Prop :=
+  -- if the strides allow for a contiguous memory layout post-merge
+  sorry
 
--- -- Define a predicate representing when two parts of a shape are mergeable
--- def are_mergeable (p₁ p₂ : Shape) : Prop :=
---   -- The merge criteria will go here (to be defined based on the provided document's rules)
---   false
-
--- -- A lemma stating conditions under which reshaping is not possible
--- lemma reshape_not_possible (p₁ : Shape) (ks : Shape) (p : Nat) :
---   (Prod (ks.take p) < p₁) ∧ (Prod (ks.take (p + 1)) > p₁) → ¬reshapable ks p₁ := by
--- -- The proof will go here (to be defined based on the provided document's rules)
---   sorry
---   -- Proof steps to be determined after formalizing the predicates and functions above
-
-
-
--- import Lean
-
--- namespace Nat
-
--- -- Theorem that states adding zero to any natural number `n` results in `n`.
--- theorem zero_add1 (n : Nat) : 0 + n = n := by
---   induction n with
---   | zero => rfl -- base case
---   | succ n ih => -- inductive step
---     have : 0 + succ n = succ (0 + n) := by rfl
---     rw [this, ih]
-
--- end Nat
+def mergeable (strides : List Int) (shape : List Int) : Prop :=
+  ∀ (x : Nat), x < strides.length - 1 →
+    let stride_x := strides.get? x;
+    let stride_next := strides.get? (x + 1);
+    let shape_next := shape.get? (x + 1)
+    match (stride_x, stride_next, shape_next) with
+    | (some sx, some sn, some sh) => sx = sn * sh
+    | _ => false
 
 
--- open Nat
-
--- theorem add_comm (m n : Nat) : m + n = n + m :=
---   Nat.recOn (motive := λ n => m + n = n + m) n
---     (by simp)
---     (fun n ih =>
---       by simp [ih, Nat.add_succ, Nat.succ_add])
-
-
--- import Lean
-
--- -- Here we would typically import the relevant part of the mathlib library for Lean 4
--- -- The definition of `Nat` and its associated arithmetic operations are part of the Lean core in the `Init` namespace.
-
--- open Lean   -- This lets us use Lean's core features without prefixing them with `Lean.`
--- open Nat    -- Similarly, this lets us use `Nat` without prefixing
-
--- -- As of my knowledge cutoff in April 2023, here's a hypothetical proof using an assumed 'mathlib' for Lean 4.
-
--- -- The following lemma states that for all natural numbers a and b, a + b equals b + a.
--- -- We use `theorem` in Lean to define a proven statement.
--- theorem add_comm (a b : Nat) : a + b = b + a :=
---   Nat.recOn b
---     (by rw [Nat.add_zero, Nat.zero_add])  -- base case: a + 0 = 0 + a
---     (fun b ih =>                         -- inductive step: assume a + b = b + a for some b
---       by rw [Nat.add_succ, ih, Nat.succ_add])  -- then show a + (b + 1) = (b + 1) + a
-
--- #check add_comm  -- This checks the theorem we just proved.
-
-
--- BASIC EXAMPLE --
--- import Lean
-
--- theorem test (p q : Prop) (hp : p) (hq : q) : p ∧ q ∧ p := by unhygienic
---   apply And.intro
---   . exact hp
---   . apply And.intro
---     . exact hq
---     . exact hp
-
--- #print test
-
-
-
-import Lean
-import Mathlib
-
-theorem test (x y : ℕ) (h : y = x + 7) : 2 * y = 2 * (x + 7) := by
-  rw [h]
-  rfl
-
-#check test
+-- TESTING
+def exampleView : View 2 := {
+  shape := ⟨[2, 3], rfl⟩,
+  stride := ⟨[3, 1], rfl⟩,
+  offset := 0,
+  mask := [[0, 1], [1, 2]],
+  contiguous := true
+}
