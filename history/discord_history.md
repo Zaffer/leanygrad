@@ -205,3 +205,66 @@ Can anyone tell me if mergeable is both a 1-op and a 2-op because p1 is mergeabl
 ```
 Is this correct : p1 mergeable, p2 mergeable, and (p1,p2) not mergeable
 I think it's more like "the two subshapes are mergeable and old_shape is not mergeable
+
+
+TabularItem — 26/02/2024 18:47
+so I guess the goal is to somehow merge these multi-views such that they look the same to a consumer of the shapetracker api?
+that is at least a good step towards defining the desired properties of a 'merge' operation, although it would be really nice to actually understand the purpose/function/desired behaviour of the View/ShapeTracker API instead of relying on unit tests to reverse engineer their desired behaviour
+
+
+mason — 26/02/2024 18:54
+I think the goal of the ShapeTracker API is to have an an algebraic system that can track the shape of the tensor as it goes through operations. Defining the shapetracker in the form of universal properties mean that compiled tensors and lazy tensors are guaranteed to act the same. The ShapeTracker must be able to track the shape of all valid operations and assert when an operation is invalid
+sometimes (but it hasn't been formally proven), mutiple views are necessary to fully track the shape of a tensor (?). If this is true, checking whether two shapetrackers are equal would be linear in the length of views. If it was possible to merge list of views into a smaller list of views (maybe 1 view), then checking equality would be fast and easy
+
+For example if you had a (10,10) shape with (1,10) strides and you permute it so the stides are (10,1) and you reshape the (10,10) shape to (100,) or (100,1), it would require two views to represent that this operation could have occurred I guess, but if you reshape the (100,)  back into (10,10) then you ony need one view because it's just a permute in total over the tensor
+But also, ShapeTrackers tracking a shape over a convolution operation for example would reduce the total number of element in a tensor so ShapeTrackers need to also work for changing total number of elements
+A view is the minimum amount of information required to transform a 1-D array of data into an arbitrary Tensor
+
+The bounty statement is "Proof or disproof of the mergeability of two arbitrary ShapeTrackers in Lean (see docs/reshape_without_symbolic.md)" Which implies the solution must merge two ShapeTrackers (ie., a list of views, not a single view). Has anyone started to reason about the algebraic rules of merging two arbitrary lists of views?
+
+
+ppg — 26/02/2024 22:27
+Pretty sure that's a typo lol.  Should say views, not shapetrackers.  Look at docs/reshape_without_symbolic.md for a subcase
+The idea is reshape makes multi-view shapetrackers, and we want to merge views inside a single shapetracker to reduce the number of views
+
+
+ppg — 26/02/2024 22:38
+Views are functions from 
+`Fin_{n_1} \times Fin_{n_2} \times ... \times Fin_{n_k} -> Nat`
+  given by strides + offset. There is also a map from 
+`Fin_{n_1 \cdot n_k} \to Fin_{n_1} \times Fin_{n_2} \times ... \times Fin_{n_k}`
+ given by inverting the default stride map.  A multiview shapetracker composes a bunch of these maps implicitly to get a map from the first view space to Nat (here Nat corresponds to memory buffer addresses).
+
+
+mason — 26/02/2024 22:38
+so there could be the case that a shapetracker is a list of disjoint views than can be syntheized into one view correct?
+
+
+ppg — 26/02/2024 22:39
+No, they are not disjoint. You think of them as functions to compose (coming from reshapes interspersed with other ops) 
+
+
+mason — 26/02/2024 23:24
+why did you use Fin? is this Fin type from lean 4? 
+
+
+mason — Yesterday at 01:46
+I'm sorry I don't think views are functions defined like you said because views are defined as a list of shapes and strides and offset and mask
+so a multiview shapetracker is not composing those exact functions
+I can't even compose these functions
+Views are functions from 
+`Fin{n_1} \times Fin{n2} \times ... \times Fin{n_k} -> Nat`
+  given by strides + offset. There is also a map from 
+I think this is the index of a view
+
+
+Karl — Yesterday at 05:21
+I think what he meant is that a view is a functor which is a high order function.
+
+
+mason — Yesterday at 11:22
+But the View function doesn't take k-tuples and output a memory address. It takes a shape at the very least and outputs a structure of the union of four lists
+
+
+KamiKomplex504 — Yesterday at 16:45
+Define disjoint, if I have indexes in view( [0-2] , [2-5] ) the view can be reduced to view ( [0-5]) but also if I have view( [2,4] , [6,8] ) well that is two adjacent views with stride/step 2 they can also be merged. Also a tensor can have multiple shape trackers, so shape trackers which may have multiple views could also be mergeable. But I do think the problem was focused around merging views not really shape trackers.
