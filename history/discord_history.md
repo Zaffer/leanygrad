@@ -154,7 +154,7 @@ acow — 14/02/2024 08:53
 I tried to grugbrain the output of ShapeTracker.expr_idxs() back into one View. Also took the top level view.shape as an argument. just brute force sampled a ton of values in the inequalities to derive a valid range per dimension (instead of solving a system of inequalities with % and // involved, which seemed insane) and sampled values to derive strides and offset. I was kinda fuzz testing this. It didnt end up working in the more complicated cases, and I didnt even test it very well for simpler ones. Taking two shapetrackers and running them both thru this simplify often produced an equal result, I just wasnt checking for any information loss lol
 
 
-TabularItem — Yesterday at 17:28
+TabularItem — 24/02/2024 17:28
 @Dalian @James Wiles Did any of you get any closer on the bounty "Proof or disproof of the mergeability of two arbitrary ShapeTrackers in Lean (see docs/reshape_without_symbolic.md)"?
 From past discussions here and on GitHub I have been trying to piece together the problem statement and the current progress on this.
 
@@ -174,21 +174,34 @@ Where do ShapeTrackers come into all this? I understand that a View is immutable
 Edit: I have also realised that this operation probably also has to take into account the strides in each dimension. So even with a trivial mask, and assuming the product of the dimensions of the old shape matches that of the new shape, it may not be possible to perform the reshape operation if the original View is non-contiguous (also image that we know what this means). 
 
 
-ppg — Yesterday at 22:45
+ppg — 24/02/2024 22:45
 @TabularItem My understanding is that the bounty is asking for a proof that the function merge_views on two views is complete (i.e. merges any two mergeable views), or to make any required changes to merge_views to make it complete.     (It may also be asking for completeness for merging more than two views, but that is more complicated).  ShapeTrackers show up because merge_views acts on consecutive pairs of views in a shapetracker.    Multi-view shapetrackers come from sequences of ops containing reshapes.
 
 
-TabularItem — Today at 05:04
+TabularItem — 25/02/2024 05:04
 One thing that's making this kind of hard is the lack of documentation/docstrings for these functions, so it seems that I have to reverse-engineer their purpose every time I encounter something new.
 As a concrete example, with a name like un1d, I really have no idea what the output should be.
 And the signature merge_views(vm2:View, vm1:View) -> Optional[View] kind of implies that the order of the input views doesn't matter, but reading just a few lines down, apparently it does. So I am not sure what is assumed of the input data, and what the properties of the output should be.
 
 
-KamiKomplex504 — Today at 09:23
+KamiKomplex504 — 25/02/2024 09:23
 Your definition is a bit incomplete. What info does a shape tracker and view of an underlying data structure need? At a bare minimum you need the start and stop ranges. Slices add on stepping or stride. They also have direction (with sign) which I feel like could be mergeable if you wrap the array back into itself in circular fashion. For a proof you can assume that all the information you could want is available but I would look at the actual view class. You can also assume all the information is or can be well formated, what I mean is anything you would need can be implemented. I would say that reduced views are handy. The stop is exactly on the end of range, the step is 1 when it can be for single elements. Also empty views can be thrown out. With all that, the theory is going to drive what you need. Views have to be adjacent or overlapping to merge. But you can Make them have this. To make them adjacent if you can remove the elements in the gap with masks, any shapes can be adjacent. To make them overlap, the range has to be inclusive of elements of the other, the stop extends past the start of another but also the step has to align otherwise the next elements will not overlap. Every element to be merged has to be represented. That is not arbitrary and could quickly grow in complexity. But it compounds. You can merge a step of 1 with a step of 7 by masking the step 7 into a step 1. But if you then merge in another step 5 you need a new mask, you can't necessarily extend the current mask. A mask btw I am assuming to be the inverse of a selecting slice. The task is to come up with theory and rules like this and then prove them (apparently in lean which I'm ngl I have never heard of) but that is the challenge. Also once you have your theories the exceptions are the interesting bit, sure with unlimited compute and unlimited storage I might be able to represent any view, but what can I achieve with primitive representation?
 Also it would be trivial to merge a set of views into an optimal reduced set. Worst case is the input is the output. But this is merging into a single view, if it is without modification to the view class then you need to see if everything is implemented for forced adjacency/overlap.
 
 
-ppg — Today at 13:05
+ppg — 25/02/2024 13:05
 To understand the merge-views code, I would start with how multiview shape trackers get created with reshapes. It’s not really about merging arbitrary single views but composing consecutive views living inside a multiview shape tracker.
 
+
+mason — 26/02/2024 14:16
+in the ShapeTracker.simplify(), it takes the views and tries to merge them to the one immediately preceding it, and continues in that way where it's one directional
+
+
+mason — 26/02/2024 15:42
+Can anyone tell me if mergeable is both a 1-op and a 2-op because p1 is mergeable individually but also p1,p2 are mergeable?
+```md
+### Assumption
+**p<sub>1</sub>** & **p<sub>2</sub>** individually are mergeable (we will discuss later on this) & we cannot merge **p<sub>1</sub>** & **p<sub>2</sub>**.
+```
+Is this correct : p1 mergeable, p2 mergeable, and (p1,p2) not mergeable
+I think it's more like "the two subshapes are mergeable and old_shape is not mergeable
