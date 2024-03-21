@@ -53,6 +53,12 @@ KamiKomplex504 — 31/01/2024 07:41
 Slices should be well defined, it's a native python class. They do have some quirks. I noticed in that repo ppg linked they are using an odd form of it but principles should be the same, a start, stop and step with negative index allowed and negative direction, and out of bounds behaviors.
 
 
+mason — 04/03/2024 00:37
+is merge_views a novel feat of man because why is the code so complicated? 😭  there must be a better way
+KamiKomplex504 — 04/03/2024 08:59
+The code might be a little complicated but the ideas aren't, it is just what makes a view mergeable by checking attributes.
+
+
 
 
 # tinygrad-dev
@@ -268,3 +274,11 @@ But the View function doesn't take k-tuples and output a memory address. It take
 
 KamiKomplex504 — Yesterday at 16:45
 Define disjoint, if I have indexes in view( [0-2] , [2-5] ) the view can be reduced to view ( [0-5]) but also if I have view( [2,4] , [6,8] ) well that is two adjacent views with stride/step 2 they can also be merged. Also a tensor can have multiple shape trackers, so shape trackers which may have multiple views could also be mergeable. But I do think the problem was focused around merging views not really shape trackers.
+
+
+mason — 11/03/2024 03:08
+and does real_strides see if it's possible to use the same strides for every single view or what
+I don't wnat to use real_strides but can anyone explain what it's functionally doing in the codebase in the first place
+I wish ShapeTracker was actually good so bad
+
+
