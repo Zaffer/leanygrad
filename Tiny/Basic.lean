@@ -1,18 +1,24 @@
--- a tensor (or tensor portion), with arbitrary shapes and strides
-structure View where
-  shape : List Nat -- dimensions for the shape
-  stride : List Nat -- indicates steps in each dimension
-  mask : List (List Int) -- indicating the indices of the original tensor that are included in the view
-  contiguous : Bool -- if the view is contiguous in memory
-  offset : Int -- offset of the view in the original tensor
-  min : List Nat -- minimum indices of the view
-  max : List Nat -- maximum indices of the view
 
--- HELPERS
-def all2 {α : Type} (p : α → α → Bool) : List α → List α → Bool -- element wise comparison for two lists
-  | [], [] => true
-  | x::xs, y::ys => p x y && all2 p xs ys
-  | _, _ => false
+structure Matrix where
+  shape : List Nat
+  stride : List Nat
+  mask : List (List Int)
+  contiguous : Bool
+  offset : Int
+  min : List Nat
+  max : List Nat
+
+
+
+
+structure View where
+  n : Nat
+  m : Nat
+  stride : Nat
+
+
+
+
 
 -- CHECKS
 def are_compatible_shapes (s1 s2 : List Nat) : Bool := -- shapes of two views are compatible, a prerequisite for merging them

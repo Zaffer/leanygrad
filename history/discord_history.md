@@ -59,6 +59,13 @@ KamiKomplex504 — 04/03/2024 08:59
 The code might be a little complicated but the ideas aren't, it is just what makes a view mergeable by checking attributes.
 
 
+KamiKomplex504 — 27/03/2024 18:35
+Inside one shape tracker I assume, since tracking across viewers should make sense. But you have to maintain a history of the transformations of the tensor for lazy realization to work. So you must be postulating that all transforms should be able to be represented inside one view. So take the case where I construct a view that is the combination of every 2nd and 3rd element aka anything divisible by 2 or 3 indexes [2,3,4,6,8,9 ...]. This representation has no common stride since the greatest common factor is 1 so you can only achieve the view with masks. I think with any arbitrary mask one view is possible but is that really merging ...
+Unless you have a different idea then by all means test that your reduction yields the same output and post it up
+There are other cases but that is just an easily conceptualized one. But I do think there is one optimal view and that the rules for merging are not really that complex.
+I also think tinygrad views only allow for an element to be represented once in a set of views so maybe amend that example to be every 2nd for [0,n] and every 3rd for [n+1,m] but same idea, I don't think a given set of views is reducible to 1 view in all cases minus masking.
+
+
 
 
 # tinygrad-dev
