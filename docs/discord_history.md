@@ -283,9 +283,33 @@ KamiKomplex504 — Yesterday at 16:45
 Define disjoint, if I have indexes in view( [0-2] , [2-5] ) the view can be reduced to view ( [0-5]) but also if I have view( [2,4] , [6,8] ) well that is two adjacent views with stride/step 2 they can also be merged. Also a tensor can have multiple shape trackers, so shape trackers which may have multiple views could also be mergeable. But I do think the problem was focused around merging views not really shape trackers.
 
 
-mason — 11/03/2024 03:08
+mason — 1/03/2024 03:08
+Does anyone have a a bunch of tests for merge_views
+there's probally not a test for all cases of View 
+I think @corsix you have some?
+
+
+mason — Today at 03:08
 and does real_strides see if it's possible to use the same strides for every single view or what
 I don't wnat to use real_strides but can anyone explain what it's functionally doing in the codebase in the first place
 I wish ShapeTracker was actually good so bad
 
 
+corsix — Today at 03:30
+I have not written any; just exercised existing tests with various options.
+
+
+mason — Today at 03:30
+I don't think 'merge_views' is called in any program in test/
+
+
+flammit — Today at 03:48
+that would be incredibly simple to prove no?
+
+
+mason — Today at 03:48
+did i use grep wrong
+
+
+flammit — Today at 03:50
+is simplify used anywhere in a test? or maybe throw an error at the top and see how many tests it breaks
