@@ -53,6 +53,19 @@ KamiKomplex504 — 31/01/2024 07:41
 Slices should be well defined, it's a native python class. They do have some quirks. I noticed in that repo ppg linked they are using an odd form of it but principles should be the same, a start, stop and step with negative index allowed and negative direction, and out of bounds behaviors.
 
 
+mason — 04/03/2024 00:37
+is merge_views a novel feat of man because why is the code so complicated? 😭  there must be a better way
+KamiKomplex504 — 04/03/2024 08:59
+The code might be a little complicated but the ideas aren't, it is just what makes a view mergeable by checking attributes.
+
+
+KamiKomplex504 — 27/03/2024 18:35
+Inside one shape tracker I assume, since tracking across viewers should make sense. But you have to maintain a history of the transformations of the tensor for lazy realization to work. So you must be postulating that all transforms should be able to be represented inside one view. So take the case where I construct a view that is the combination of every 2nd and 3rd element aka anything divisible by 2 or 3 indexes [2,3,4,6,8,9 ...]. This representation has no common stride since the greatest common factor is 1 so you can only achieve the view with masks. I think with any arbitrary mask one view is possible but is that really merging ...
+Unless you have a different idea then by all means test that your reduction yields the same output and post it up
+There are other cases but that is just an easily conceptualized one. But I do think there is one optimal view and that the rules for merging are not really that complex.
+I also think tinygrad views only allow for an element to be represented once in a set of views so maybe amend that example to be every 2nd for [0,n] and every 3rd for [n+1,m] but same idea, I don't think a given set of views is reducible to 1 view in all cases minus masking.
+
+
 
 
 # tinygrad-dev
@@ -270,7 +283,7 @@ KamiKomplex504 — Yesterday at 16:45
 Define disjoint, if I have indexes in view( [0-2] , [2-5] ) the view can be reduced to view ( [0-5]) but also if I have view( [2,4] , [6,8] ) well that is two adjacent views with stride/step 2 they can also be merged. Also a tensor can have multiple shape trackers, so shape trackers which may have multiple views could also be mergeable. But I do think the problem was focused around merging views not really shape trackers.
 
 
-mason — Today at 02:55
+mason — 1/03/2024 03:08
 Does anyone have a a bunch of tests for merge_views
 there's probally not a test for all cases of View 
 I think @corsix you have some?
