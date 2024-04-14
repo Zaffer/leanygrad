@@ -1,12 +1,12 @@
 
-structure Matrix where
+structure Matrix' where
   shape : List Nat
   stride : List Nat
   mask : List (List Int)
-  contiguous : Bool
-  offset : Int
-  min : List Nat
-  max : List Nat
+  -- contiguous : Bool -- not needed for now implemented in the package but perhaps not needed here
+  -- offset : Int
+  -- min : List Nat
+  -- max : List Nat
 
 
 
