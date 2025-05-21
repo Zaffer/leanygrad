@@ -20,8 +20,6 @@ If those two conditions hold, ShapeTracker can drop v1 and v2 and just use v3—
 
 # Mathy wording
 
-# Mergeable Views in Tinygrad
-
 A **view** is a function that, given a valid coordinate tuple $`(x_0,\dots,x_{n-1})`$ in some shape $`s=(s_0,\dots,s_{n-1})`$, computes a single linear memory index. Common view operations include **reshape**, **transpose**, **expand** (broadcast), and **strided slice**, each of which defines a new coordinate‑to‑index mapping (and a new shape).
 
 A **ShapeTracker** maintains an ordered list of these view functions. If you start with a flat array of length $`N`$, applying view 1 ($`v_1`$) produces one shape, then applying view 2 ($`v_2`$) produces another. Concretely:
