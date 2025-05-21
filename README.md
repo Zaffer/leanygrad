@@ -2,7 +2,7 @@
 
 > Proof or disproof of the mergeability of two arbitrary ShapeTrackers in Lean (generic version of https://github.com/tinygrad/tinygrad/pull/2218/files)
 
-# Simeple wording
+# Simple wording
 
 A view is simply a rule that takes each coordinate in a tensor (like `(x, y, z)`) and tells you which position in the flat memory array to read or write. Common rules include reshaping (re‑grouping elements), transposing axes, broadcasting (expanding a 1‑size dimension), and slicing or striding (picking every k‑th element).
 
