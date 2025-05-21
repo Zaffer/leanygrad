@@ -20,38 +20,41 @@ If those two conditions hold, ShapeTracker can drop v1 and v2 and just use v3—
 
 # Mathy wording
 
-A **view** is a function that, given a valid coordinate tuple \((x_0,\dots,x_{n-1})\) in some shape \(s=(s_0,\dots,s_{n-1})\), computes a single linear memory index. Common view operations include **reshape**, **transpose**, **expand** (broadcast), and **strided slice**, each of which defines a new coordinate‑to‑index mapping (and a new shape).
+# Mergeable Views in Tinygrad
 
-A **ShapeTracker** maintains an ordered list of these view functions. If you start with a flat array of length \(N\), applying view 1 (\(v_1\)) produces one shape, then applying view 2 (\(v_2\)) produces another. Concretely:
+A **view** is a function that, given a valid coordinate tuple $`(x_0,\dots,x_{n-1})`$ in some shape $`s=(s_0,\dots,s_{n-1})`$, computes a single linear memory index. Common view operations include **reshape**, **transpose**, **expand** (broadcast), and **strided slice**, each of which defines a new coordinate‑to‑index mapping (and a new shape).
 
-\[
-  v_1 : (N)\;\to\;s_1,\quad
-  v_2 : s_1\;\to\;s_2.
-\]
+A **ShapeTracker** maintains an ordered list of these view functions. If you start with a flat array of length $`N`$, applying view 1 ($`v_1`$) produces one shape, then applying view 2 ($`v_2`$) produces another. Concretely:
 
-To optimize indexing (and thus the compute graph), we look for a single view \(v_3 : (N)\to s_2\) whose index function is **identical** to \(v_2\circ v_1\). In other words, rather than computing
+$$`
+v_1 : (N)\;\to\;s_1,\quad
+v_2 : s_1\;\to\;s_2.
+`$$
 
-\[
-  \text{idx} = v_2\bigl(v_1(x)\bigr)
-\]
+To optimize indexing (and thus the compute graph), we look for a single view $`v_3 : (N)\to s_2`$ whose index function is **identical** to $`v_2\circ v_1`$. In other words, rather than computing
+
+$$`
+\text{idx} = v_2\bigl(v_1(x)\bigr)
+`$$
 
 in two steps, we want
 
-\[
-  \text{idx} = v_3(x)
-\]
+$$`
+\text{idx} = v_3(x)
+`$$
 
 in one step.
 
-We call \(v_1\) and \(v_2\) **mergeable** if and only if there exists such a \(v_3\) with  
+We call $`v_1`$ and $`v_2`$ **mergeable** if and only if there exists such a $`v_3`$ with:
 
-1. **the same output shape** \(s_2\), and  
-2. for every valid coordinate \(x\in s_2\),  
-   \[
+1. **the same output shape** $`s_2`$, and  
+2. for every valid coordinate $`x\in s_2`$,  
+   $$`
      v_3(x) \;=\; v_2\bigl(v_1(x)\bigr).
-   \]
+   `$$
 
-In that case, the ShapeTracker can replace the two-element chain \([v_1, v_2]\) with the single view \([v_3]\), yielding identical semantics but simpler, faster index computation.
+In that case, the ShapeTracker can replace the two-element chain `[v_1, v_2]` with the single view `[v_3]`, yielding identical semantics but simpler, faster index computation.
+
 
 # Further reading:
 - https://github.com/tinygrad/tinygrad/issues/8511
